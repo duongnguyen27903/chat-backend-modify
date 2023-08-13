@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Users } from 'src/entity/users.entity';
+import { UserRoles, Users } from 'src/entity/users.entity';
 import LoginDto from './dto/login.dto';
 import SignUpDto from './dto/signup.dto';
 
@@ -17,7 +17,7 @@ export class AuthService {
   constructor(
     @InjectRepository(Users) private usersRepository: Repository<Users>,
     private jwt: JwtService,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
@@ -36,7 +36,7 @@ export class AuthService {
     }
   }
 
-  async signup(signupDto: SignUpDto) {
+  async signup(signupDto: SignUpDto, role: UserRoles) {
     const { email, password, name, phone_number } = signupDto;
     if (!!(await this.usersRepository.count({ where: { email: email } })))
       throw new ConflictException(
@@ -52,6 +52,7 @@ export class AuthService {
         salt: salt,
         name: name,
         phone_number: phone_number,
+        role: role
       });
       return {
         message: 'Create account successfully',

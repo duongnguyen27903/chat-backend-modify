@@ -3,7 +3,7 @@ import { IsEmail, Matches, MaxLength, MinLength } from 'class-validator';
 
 export default class SignUpDto {
   @IsEmail()
-  @ApiProperty({ required: true, example: 'mail@example.com' })
+  @ApiProperty({ required: true, example: 'user@gmail.com' })
   readonly email: string;
 
   @ApiProperty({ required: true })

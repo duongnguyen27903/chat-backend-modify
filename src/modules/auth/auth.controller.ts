@@ -6,16 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  UseGuards
 } from '@nestjs/common';
 import LoginDto from './dto/login.dto';
 import SignUpDto from './dto/signup.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { UserRoles } from 'src/entity/users.entity';
+import { AuthGuard } from './auth.guard';
 
 @ApiTags('login')
 @Controller({ path: ['auth'] })
 export class AuthController {
-  constructor(private readonly usersService: AuthService) {}
+  constructor(private readonly usersService: AuthService) { }
 
   @Post('login')
   async login(@Body() body: LoginDto) {
@@ -23,7 +27,15 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signup(@Body() body: SignUpDto) {
-    return await this.usersService.signup(body);
+  @ApiQuery({ name: 'role', enum: UserRoles })
+  async signup(@Body() body: SignUpDto, @Query('role') role: UserRoles) {
+    return await this.usersService.signup(body, role);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('test')
+  async test() {
+    return 'pass authentication'
   }
 }

@@ -1,5 +1,3 @@
-import { ApiProperty } from '@nestjsx/crud/lib/crud';
-import { isEmail } from 'class-validator';
 import {
   Column,
   Entity,
@@ -7,21 +5,21 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum UserRoles {
+  ADMIN = 'admin',
+  USER = 'user'
+}
+
 @Entity('users')
 export class Users {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @ApiProperty()
   @Column({ unique: true })
   email: string;
-  @ApiProperty()
   @Column()
   password: string;
-  @ApiProperty()
   @Column()
   name: string;
-  @ApiProperty()
   @Column()
   phone_number: string;
   @Column()
@@ -30,4 +28,6 @@ export class Users {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @Column({ type: 'enum', enum: UserRoles })
+  role: string
 }

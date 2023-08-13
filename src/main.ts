@@ -21,7 +21,7 @@ async function bootstrap() {
   app.enableCors(corsOptions);
 
   const config = new DocumentBuilder()
-    // .addBearerAuth()
+    .addBearerAuth()
     .setTitle(`SOC1-USECASE`)
     .setDescription(`API SOC1-USECASE ${process.env.NODE_ENV}`)
     .setVersion('1.0')
