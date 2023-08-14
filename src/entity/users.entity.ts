@@ -1,9 +1,11 @@
 import {
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Maps } from './groups.entity';
 
 export enum UserRoles {
   ADMIN = 'admin',
@@ -30,4 +32,7 @@ export class Users {
   updatedAt: Date;
   @Column({ type: 'enum', enum: UserRoles })
   role: string
+
+  @OneToMany(() => Maps, (map_user) => map_user.id)
+  map_user: Maps[]
 }
