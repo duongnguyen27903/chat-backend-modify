@@ -150,22 +150,12 @@ export class GroupsService {
         return all_groups;
     }
 
-    async delete_group(id: string) {
-        const find_map_group = await this.maps.find({
-            where: {
-                group: id
-            }
-        })
-        let promises = [];
-        for (let i of find_map_group) {
-            const delete_map = await this.maps.delete(i.group);
-            promises.push(delete_map);
-        }
-        const delete_one_group = await this.groups.delete(id);
-        promises.push(delete_one_group);
+    async delete_group(group: string) {
+        const delete_map_group = await this.maps.delete({ group: group })
+        const delete_group = await this.groups.delete({ id: group })
         try {
-            Promise.all(promises);
-            return "Delete group successfully"
+            Promise.all([delete_map_group, delete_group]);
+            return "Delete group successfully";
         } catch (error) {
             return new BadRequestException('Cannot delete group, please try again and assure your internet connection')
         }

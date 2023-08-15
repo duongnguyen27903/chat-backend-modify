@@ -53,9 +53,9 @@ export class GroupsController {
 
   @Delete('delete_group')
   async delete_group(
-    @Query('id') id: string
+    @Query('group') group: string
   ) {
-    return await this.groupsService.delete_group(id);
+    return await this.groupsService.delete_group(group);
   }
 
   @Patch('set_nickname')
