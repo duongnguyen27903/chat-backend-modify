@@ -31,4 +31,6 @@ export class Maps {
     group: string
     @Column({ type: 'enum', enum: GroupRoles })
     group_role: string
+    @Column({ nullable: true })
+    nickname: string
 }

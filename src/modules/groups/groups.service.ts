@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Like } from 'typeorm';
 import { GroupRoles, Groups, Maps } from 'src/entity/groups.entity';
 import { Users } from 'src/entity/users.entity';
 import { Repository } from 'typeorm';
@@ -123,5 +124,83 @@ export class GroupsService {
         } catch (error) {
             return new BadRequestException('Cannot create group, please try again and assure your internet connection')
         }
+    }
+
+    async find_user(name: string) {
+        const users = await this.users.find({
+            where: {
+                name: Like(`%${name}%`)
+            }
+        })
+        return users
+    }
+
+    async in_group(id: string) {
+        const group = await this.maps
+            .createQueryBuilder('maps')
+            .leftJoinAndSelect('maps.group', 'group')
+            .leftJoinAndSelect('maps.user', 'user')
+            .where('user.id = :id', { id: id })
+            .execute();
+        return group;
+    }
+
+    async get_all_groups() {
+        const all_groups = await this.groups.find();
+        return all_groups;
+    }
+
+    async delete_group(id: string) {
+        const find_map_group = await this.maps.find({
+            where: {
+                group: id
+            }
+        })
+        let promises = [];
+        for (let i of find_map_group) {
+            const delete_map = await this.maps.delete(i.group);
+            promises.push(delete_map);
+        }
+        const delete_one_group = await this.groups.delete(id);
+        promises.push(delete_one_group);
+        try {
+            Promise.all(promises);
+            return "Delete group successfully"
+        } catch (error) {
+            return new BadRequestException('Cannot delete group, please try again and assure your internet connection')
+        }
+    }
+
+    async update_group(id: string, name: string) {
+        try {
+            const update = await this.groups.createQueryBuilder()
+                .update(Groups)
+                .set({
+                    name: name,
+                })
+                .where('id = :id', { id: id })
+                .execute();
+            return update;
+        } catch (error) {
+            return new BadRequestException('Cannot rename group, please try again and assure your internet connection')
+        }
+    }
+
+    async set_nickname(user: string, group: string, nickname: string) {
+        try {
+            const set_nickname = await this.maps
+                .createQueryBuilder()
+                .update(Maps)
+                .set({
+                    nickname: nickname
+                })
+                .where('user = :user', { user: user })
+                .andWhere('group = :group', { group: group })
+                .execute();
+            return set_nickname;
+        } catch (error) {
+            return new BadRequestException('Cannot set your nickname, please try again and assure your internet connection')
+        }
+
     }
 }
