@@ -3,9 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   Query,
   UseGuards
 } from '@nestjs/common';
@@ -15,8 +12,6 @@ import { ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserRoles } from 'src/entity/users.entity';
 import { AuthGuard } from './auth.guard';
-import { Roles } from '../decorators/roles.decorator';
-import { RolesGuard } from '../decorators/guards/roles.guard';
 
 @ApiTags('login')
 @Controller({ path: ['auth'] })
