@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { Groups, Maps } from './entity/groups.entity';
 import { GroupsModule } from './modules/groups/groups.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { GroupsModule } from './modules/groups/groups.module';
     }),
     AuthModule,
     UsersModule,
-    GroupsModule
+    GroupsModule,
+    ChatModule
   ],
 })
 export class AppModule { }
