@@ -141,6 +141,7 @@ export class GroupsService {
             .leftJoinAndSelect('maps.group', 'group')
             .leftJoinAndSelect('maps.user', 'user')
             .where('user.id = :id', { id: id })
+            .select(['group.name', 'group.id', 'group.createAt', 'group.message', 'maps.*'])
             .execute();
         return group;
     }

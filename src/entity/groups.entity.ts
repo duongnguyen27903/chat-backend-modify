@@ -9,8 +9,8 @@ export class Groups {
     name: string
     @CreateDateColumn()
     createAt: Date
-    @Column({ type: 'json', nullable: true })
-    message: any
+    @Column({ type: 'json', default: [] })
+    messages: any
 
     @OneToMany(() => Maps, (map_group) => map_group.id)
     map_group: Maps[]
