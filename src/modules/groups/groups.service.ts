@@ -127,12 +127,17 @@ export class GroupsService {
     }
 
     async find_user(name: string) {
-        const users = await this.users.find({
-            where: {
-                name: Like(`%${name}%`)
-            }
-        })
-        return users
+        if (name !== "") {
+            const users = await this.users.find({
+                where: {
+                    name: Like(`%${name}%`)
+                }
+            })
+            return users
+        }
+
+        else return []
+
     }
 
     async in_group(id: string) {
