@@ -17,7 +17,8 @@ export class ChatGateway {
   @SubscribeMessage('load_groups')
   async load_groups(
     @MessageBody('id') id: string,
-    @ConnectedSocket() client: Socket//lấy ra toàn bộ thông tin kết nối socket của client đến server
+    @ConnectedSocket() client: Socket,//lấy ra toàn bộ thông tin kết nối socket của client đến server
+    // @ConnectedSocket() server : Server
   ) {
     const groups = await this.chatService.load_groups(id);
 
@@ -26,18 +27,23 @@ export class ChatGateway {
       joinRooms.push(group.group_id)
     });
     if (groups) {
-      client.join(id)//tạo room là id của user chứa kết nối socket hiện tại 
+      client.join(id);//tạo room là id của user chứa kết nối socket hiện tại 
     }
     client.join(joinRooms);//tạo nhiều room chứa kết nối đến socket hiện tại
+    // console.log(this.server.sockets.adapter.rooms);
     return this.server.to(id).emit('groups', groups)// to(id) là emit một event đến room(id)
   }
 
   @SubscribeMessage('load_messages')
   async load_messages(
-    @MessageBody('id') id: string
+    @MessageBody('id') id: string,
+    @ConnectedSocket() client: Socket
   ) {
+
     const messages = await this.chatService.load_messages(id);
     if (messages) {
+      client.join(messages.id);
+      // console.log(this.server.sockets.adapter.rooms);
       return this.server.to(id).emit('messages', messages);
     }
   }

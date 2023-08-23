@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Patch, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Patch, Delete, Param } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('groups')
@@ -36,11 +36,11 @@ export class GroupsController {
     return await this.groupsService.find_user(name);
   }
 
-  @Get('in_group')
+  @Get('group_of_user')
   async in_group(
     @Query('id') id: string
   ) {
-    return await this.groupsService.in_group(id);
+    return await this.groupsService.group_of_user(id);
   }
 
   @Patch('update_group')
@@ -65,5 +65,27 @@ export class GroupsController {
     @Query('nickname') nickname: string
   ) {
     return await this.groupsService.set_nickname(user, group, nickname);
+  }
+
+  @Get('users_in_group/:id')
+  async users_in_group(@Param('id') id: string) {
+    return await this.groupsService.users_in_group(id);
+  }
+
+  @Delete('/remove_user')
+  async remove_user(
+    @Query('host') host: string,
+    @Query('user') user: string,
+    @Query('group') group: string
+  ) {
+    return await this.groupsService.remove_user_from_group(host, user, group);
+  }
+
+  @Post('/add_user')
+  async add_user(
+    @Query('user') user: string,
+    @Query('group') group: string
+  ) {
+    return await this.groupsService.add_user_to_group(user, group);
   }
 }

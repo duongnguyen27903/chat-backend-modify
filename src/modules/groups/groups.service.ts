@@ -58,7 +58,7 @@ export class GroupsService {
                 .execute();
             try {
                 Promise.all([create_group, create_map_creator, create_map_member]);
-                return "Create group successfully";
+                return create_group['generatedMaps'][0]
             } catch (error) {
                 return new BadRequestException('Cannot create groups, you can try again')
             }
@@ -120,7 +120,7 @@ export class GroupsService {
         }
         try {
             Promise.all([create_group, create_map_creator, promises]);
-            return "Create group successfully"
+            return create_group['generatedMaps'][0]
         } catch (error) {
             return new BadRequestException('Cannot create group, please try again and assure your internet connection')
         }
@@ -140,7 +140,7 @@ export class GroupsService {
 
     }
 
-    async in_group(id: string) {
+    async group_of_user(id: string) {
         const group = await this.maps
             .createQueryBuilder('maps')
             .leftJoinAndSelect('maps.group', 'group')
@@ -197,6 +197,80 @@ export class GroupsService {
         } catch (error) {
             return new BadRequestException('Cannot set your nickname, please try again and assure your internet connection')
         }
+    }
 
+    async users_in_group(id: string) {
+        const all_users = await this.maps
+            .createQueryBuilder('maps')
+            .leftJoinAndSelect('maps.user', 'user')
+            .leftJoinAndSelect('maps.group', 'group')
+            .where('group.id = :id', { id: id })
+            .select(['maps.*', 'user.name'])
+            .execute()
+        return all_users;
+    }
+
+    async remove_user_from_group(host: string, user: string, group: string) {
+
+        const check_host = await this.maps
+            .createQueryBuilder('maps')
+            .leftJoinAndSelect('maps.user', 'user')
+            .leftJoinAndSelect('maps.group', 'group')
+            .where('group.id = :group', { group: group })
+            .andWhere('user.id = :host', { host: host })
+            .andWhere('maps.group_role = :role', { role: GroupRoles.ADMIN })
+            .execute()
+        if (!check_host || check_host.length === 0) {
+            return new BadRequestException('You are not the owner of the group')
+        }
+        try {
+
+            const remove = await this.maps.delete({
+                user: user,
+                group: group,
+            })
+            return remove;
+        } catch (error) {
+            return new BadRequestException('Cannot remove user, please try again')
+        }
+    }
+    async add_user_to_group(user: string, group: string) {
+        const check_user = await this.users.findOne({
+            where: {
+                id: user
+            }
+        })
+        const check_group = await this.groups.findOne({
+            where: {
+                id: group
+            }
+        })
+        const check_map = await this.maps
+            .createQueryBuilder('maps')
+            .leftJoinAndSelect('maps.user', 'user')
+            .leftJoinAndSelect('maps.group', 'group')
+            .where('group.id = :group', { group: group })
+            .andWhere('user.id = :user', { user: user })
+            .execute()
+
+        if (!check_user || !check_group || check_map.length !== 0) {
+            return "Cannot add user"
+        }
+        const add_user = await this.maps.createQueryBuilder()
+            .insert()
+            .into(Maps)
+            .values({
+                user: check_user.id,
+                group: check_group.id,
+                group_role: GroupRoles.MEMBER
+            })
+            .execute();
+
+        try {
+            Promise.all([add_user]);
+            return add_user.generatedMaps[0]
+        } catch (error) {
+            return new BadRequestException("Cannot add user")
+        }
     }
 }
